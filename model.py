@@ -1,0 +1,61 @@
+from flask import Flask, render_template, request, url_for
+import pandas as pd
+import pickle
+from sklearn.preprocessing import StandardScaler
+import os
+
+app = Flask(__name__)
+
+# Set the template folder explicitly
+current_folder = os.path.abspath(os.getcwd())  # Get the current working directory
+template_folder_path = os.path.join(current_folder, 'C:/Users/HP/project2/templates')
+app = Flask(__name__, template_folder=template_folder_path)
+
+# Load your pre-trained RandomForest Regression model
+model_path = 'C:/Users/HP/project2/pred/model.pkl'
+with open(model_path, 'rb') as model_file:
+    model = pickle.load(model_file)
+
+# Load the scaler for input features
+input_scaler_path = 'C:/Users/HP/project2/pred/features_scaler.pkl'
+with open(input_scaler_path, 'rb') as input_scaler_file:
+    input_scaler = pickle.load(input_scaler_file)
+
+# Load the scaler for the target variable
+target_scaler_path = 'C:/Users/HP/project2/pred/target_scaler.pkl'
+with open(target_scaler_path, 'rb') as target_scaler_file:
+    target_scaler = pickle.load(target_scaler_file)
+
+# Define the columns to scale
+columns_to_scale = ['Formulation Duration (hrs)', 'Additive Catalyst (gm)', 'Plasticizer (gm)']
+
+@app.route('/')
+def index():
+    return render_template('index(4).html')
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    if request.method == 'POST':
+        # Get user input from the form
+        input_data = {
+            'Formulation Duration (hrs)': float(request.form['Formulation_Duration']),
+            'Additive Catalyst (gm)': float(request.form['Additive_Catalyst']),
+            'Plasticizer (gm)': float(request.form['Plasticizer']),
+        }
+
+        # Convert input data to a DataFrame
+        input_df = pd.DataFrame([input_data])
+
+        # Scale the input data using the loaded scaler
+        scaled_input = input_scaler.transform(input_df[columns_to_scale])
+
+        # Make predictions using the loaded model
+        scaled_prediction = model.predict(scaled_input)[0]
+
+        # Inverse transform the predicted value for the target variable
+        prediction = target_scaler.inverse_transform(scaled_prediction.reshape(-1, 1))[0][0]
+
+        return render_template('index(4).html', input_data=input_data, prediction=prediction)
+
+if __name__ == '__main__':
+    app.run(debug=True)

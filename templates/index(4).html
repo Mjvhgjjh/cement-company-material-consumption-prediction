@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction App</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            margin-top: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        input {
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .prediction-result {
+            margin-top: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Prediction App</h1>
+
+    <form method="post" action="/predict">
+        <label for="Formulation_Duration">Formulation Duration (hrs):</label>
+        <input type="text" name="Formulation_Duration" required><br>
+
+        <label for="Additive_Catalyst">Additive Catalyst (gm):</label>
+        <input type="text" name="Additive_Catalyst" required><br>
+
+        <label for="Plasticizer">Plasticizer (gm):</label>
+        <input type="text" name="Plasticizer" required><br>
+
+        <button type="submit">Predict</button>
+    </form>
+
+    {% if input_data %}
+        <div class="prediction-result">
+            <h2>Prediction Result</h2>
+            <p>For the input:</p>
+            <ul>
+                {% for key, value in input_data.items() %}
+                    <li>{{ key }}: {{ value }}</li>
+                {% endfor %}
+            </ul>
+            <p>The predicted value is: {{ prediction }}</p>
+        </div>
+    {% endif %}
+</body>
+</html>
