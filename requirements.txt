@@ -1,6 +1,5 @@
 Flask==3.0.0
 gunicorn==21.2.0
-jinja==2.10.1
 Markupsafe==1.1.1
 Werkzeug==0.15.5
 numpy>=1.9.2
